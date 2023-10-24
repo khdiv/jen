@@ -18,9 +18,10 @@ pipeline {
 
         stage('SonarQube Scan') {
             steps {
-                withSonarQubeEnv('SonarQube') {
+                //name from jenkins
+                withSonarQubeEnv('My_Sonar') {
                     // Запускаємо аналіз коду на SonarQube
-                    sh "sonar-scanner"
+                    sh "${tool('My_Sonar')}/bin/sonar-scanner"
                 }
             }
         }
