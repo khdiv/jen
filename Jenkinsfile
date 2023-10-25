@@ -22,6 +22,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'sonarqube-credentials', variable: 'SONAR_TOKEN')]) {
                     withSonarQubeEnv('My_Sonar') {
                         sh 'sonar-scanner -Dsonar.login=$SONAR_TOKEN'
+                    }
                 }
             }
         }
@@ -47,5 +48,4 @@ pipeline {
             }
         }
     }
-}
 }
