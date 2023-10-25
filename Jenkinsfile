@@ -3,7 +3,7 @@ pipeline {
     
     environment {
         // Встановлюємо змінні середовища
-        SONARQUBE_URL = 'http://localhost:9000'
+        //SONARQUBE_URL = 'http://localhost:9000'
         DOCKER_REPO = 'my-docker-repo'
         DOCKER_IMAGE_NAME = 'my-docker-image'
     }
@@ -16,16 +16,17 @@ pipeline {
             }
         }
 
-        stage('SonarQube Scan') {
-            steps {
+        //stage('SonarQube Scan') {
+         //   steps {
                 //name from jenkins
-                withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
-                    withSonarQubeEnv('My_Sonar') {
-                        sh 'sonar-scanner -Dsonar.login=$SONAR_TOKEN'
-                    }
-                }
-            }
-        }
+          //      withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+           //         withSonarQubeEnv('My_Sonar') {
+            //            sh 'sonar-scanner -Dsonar.login=$SONAR_TOKEN'
+           //         }
+           //     }
+           // }
+        //}
+        
 
         stage('Build Docker Image') {
             steps {
