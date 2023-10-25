@@ -19,7 +19,7 @@ pipeline {
         stage('SonarQube Scan') {
             steps {
                 //name from jenkins
-                withCredentials([string(credentialsId: 'sonarqube-credentials', variable: 'SONAR_TOKEN')]) {
+                withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
                     withSonarQubeEnv('My_Sonar') {
                         sh 'sonar-scanner -Dsonar.login=$SONAR_TOKEN'
                     }
