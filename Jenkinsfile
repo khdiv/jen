@@ -19,9 +19,9 @@ pipeline {
         stage('SonarQube Scan') {
             steps {
                 //name from jenkins
-                withSonarQubeEnv('My_Sonar') {
-                    // Запускаємо аналіз коду на SonarQube
-                    sh "${tool('My_Sonar')}/bin/sonar-scanner"
+                withCredentials([string(credentialsId: 'sonarqube-credentials', variable: 'SONAR_TOKEN')]) {
+                    withSonarQubeEnv('My_Sonar') {
+                        sh 'sonar-scanner -Dsonar.login=$SONAR_TOKEN'
                 }
             }
         }
@@ -47,4 +47,5 @@ pipeline {
             }
         }
     }
+}
 }
