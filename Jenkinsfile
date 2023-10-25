@@ -21,7 +21,7 @@ pipeline {
                 //name from jenkins
                 withSonarQubeEnv('My_Sonar') {
                     // Запускаємо аналіз коду на SonarQube
-                    sh "${tool('My_Sonar')}/bin/sonar-scanner"
+                    sh "${tool('My_Sonar')}/bin/sonar-scanner -Dsonar.login=squ_7f6004870f76bcb02facde779d6ba21911f215fa"
                 }
             }
         }
