@@ -1,47 +1,37 @@
 pipeline {
     agent any
-    
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+    }
+
     environment {
-        DOCKER_REPO = 'my-docker-repo'
-        DOCKER_IMAGE_NAME = 'my-docker-image'
+        DOCKERHUB_CREDENTIALS = credentials('docker-hub')
     }
 
     stages {
-        stage('Checkout') {
+        stage('Build') {
             steps {
-                checkout scm
+                sh 'docker build -t lloydmatereke/jenkins-docker-hub .'
             }
         }
 
-        // Uncomment this section if you want to use SonarQube
-        // stage('SonarQube Scan') {
-        //     steps {
-        //         withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
-        //             withSonarQubeEnv('My_Sonar') {
-        //                 sh 'sonar-scanner -Dsonar.login=$SONAR_TOKEN'
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Login') {
+            steps {
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+            }
+        }
 
-    stage('Build Docker Image') {
-        steps {
-            script {
-                    // Build Docker image
-                sh "docker build -t ${env.DOCKER_REPO}/${env.DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER} ."
+        stage('Push') {
+            steps {
+                sh 'docker push lloydmatereke/jenkins-docker-hub'
             }
         }
     }
 
-    stage('Push Docker Image') {
-        steps {
-            script {
-                    // Push Docker image
-                sh "docker push ${env.DOCKER_REPO}/${env.DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER}"
-            }
-            }
+    post {
+        always {
+            sh 'docker logout'
         }
-    
+    }
 }
-}
-
