@@ -35,7 +35,7 @@ pipeline {
         stage('Tag and Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry('', 'docker-credential2') {
+                    docker.withRegistry('', 'docker-credentials') {
                         docker.image("${env.DOCKER_REPO}/${env.DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER}").push()
                         docker.image("${env.DOCKER_REPO}/${env.DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER}").push('latest')
                     }
