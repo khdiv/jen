@@ -24,24 +24,24 @@ pipeline {
         //     }
         // }
 
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    docker.build("${env.DOCKER_REPO}/${env.DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER}")
-                }
+    stage('Build Docker Image') {
+        steps {
+            script {
+                    // Build Docker image
+                sh "docker build -t ${env.DOCKER_REPO}/${env.DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER} ."
             }
         }
+    }
 
-        stage('Tag and Push Docker Image') {
-            steps {
-                script {
-                    docker.withRegistry('', 'docker-key') {
-                        docker.image("${env.DOCKER_REPO}/${env.DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER}").push()
-                        docker.image("${env.DOCKER_REPO}/${env.DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER}").push('latest')
-                    }
-                }
+    stage('Push Docker Image') {
+        steps {
+            script {
+                    // Push Docker image
+                sh "docker push ${env.DOCKER_REPO}/${env.DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER}"
+            }
             }
         }
-
-      }
+    
 }
+}
+
