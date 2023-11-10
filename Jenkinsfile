@@ -7,35 +7,41 @@ pipeline {
     }
 
     stages {
-        // ... (your existing stages)
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
 
-        stage('Tag Docker Image') {
+        // Uncomment this section if you want to use SonarQube
+        // stage('SonarQube Scan') {
+        //     steps {
+        //         withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+        //             withSonarQubeEnv('My_Sonar') {
+        //                 sh 'sonar-scanner -Dsonar.login=$SONAR_TOKEN'
+        //             }
+        //         }
+        //     }
+        // }
+
+        stage('Build Docker Image') {
             steps {
                 script {
-                    // Use the build number as the tag
-                    def buildTag = "${env.BUILD_NUMBER}"
-
-                    // Tag the image without specifying a tag (uses the latest tag)
-                    docker.tag("${env.DOCKER_REPO}/${env.DOCKER_IMAGE_NAME}:${buildTag}", "${env.DOCKER_REPO}/${env.DOCKER_IMAGE_NAME}")
-                    
-                    // Tag the image with a specific tag
-                    docker.tag("${env.DOCKER_REPO}/${env.DOCKER_IMAGE_NAME}:${buildTag}", "${env.DOCKER_REPO}/${env.DOCKER_IMAGE_NAME}:my-docker-image")
+                    docker.build("${env.DOCKER_REPO}/${env.DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER}")
                 }
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Tag and Push Docker Image') {
             steps {
                 script {
                     docker.withRegistry('', 'docker-hub') {
-                        // Push the image with the latest tag
-                        docker.image("${env.DOCKER_REPO}/${env.DOCKER_IMAGE_NAME}").push()
-
-                        // Push the image with a specific tag
-                        docker.image("${env.DOCKER_REPO}/${env.DOCKER_IMAGE_NAME}:my-docker-image").push()
+                        docker.image("${env.DOCKER_REPO}/${env.DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER}").push()
+                        docker.image("${env.DOCKER_REPO}/${env.DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER}").push('latest')
                     }
                 }
             }
         }
-    }
+
+      }
 }
