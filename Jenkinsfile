@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        DOCKER_REPO = 'my-docker-repo'
+        DOCKER_REPO = 'khdiv/my-docker-repo'
         DOCKER_IMAGE_NAME = 'my-docker-image'
     }
 
