@@ -1,47 +1,54 @@
 pipeline {
     agent any
-    
     environment {
-        DOCKER_REPO = 'khdiv/my-docker-repo'
-        DOCKER_IMAGE_NAME = 'my-docker-image'
+        DOCKER_REPO = 'khdiv/jenkins-images'
+        DOCKER_TAG = '0.4'
+        //SONAR_RUNNER_HOME = '/opt/sonar-scanner'
     }
 
     stages {
-        stage('Checkout') {
+        stage('Docker version') {
             steps {
-                checkout scm
+                sh "echo $USER"
+                sh 'docker version'
             }
         }
 
-        // Uncomment this section if you want to use SonarQube
-        // stage('SonarQube Scan') {
-        //     steps {
-        //         withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
-        //             withSonarQubeEnv('My_Sonar') {
-        //                 sh 'sonar-scanner -Dsonar.login=$SONAR_TOKEN'
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Test') {
+            steps {
+                dir('docker-push') {
+                    sh "ls -la "
+                    sh "pwd"
+                }
+                sh "ls -la "
+                sh "pwd"
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                git branch: 'feature',
+                    url: 'https://github.com/khdiv/jen.git'        
+            }
+        }
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    docker.build("${env.DOCKER_REPO}/${env.DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER}")
+                dir('docker-push') {
+                    // Assuming Dockerfile is in the same directory as Jenkinsfile
+                    sh 'docker build -t khdiv/jenkins-images:0.4  -f /var/lib/jenkins/workspace/docker-push/Dockerfile .'
                 }
             }
         }
 
-        stage('Tag and Push Docker Image') {
+        stage('Push docker image to DockerHub') {
             steps {
-                script {
-                    docker.withRegistry('', 'docker-hub') {
-                        docker.image("${env.DOCKER_REPO}/${env.DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER}").push()
-                        docker.image("${env.DOCKER_REPO}/${env.DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER}").push()
-                    }
+                withDockerRegistry(credentialsId: 'docker-hub', url: 'https://index.docker.io/v1/') {
+                    sh '''
+                        docker push khdiv/jenkins-images:0.4
+                    '''
                 }
             }
         }
-
-      }
+    }
 }
