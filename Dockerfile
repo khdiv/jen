@@ -1,8 +1,7 @@
-# Use the official Apache image
 FROM httpd:alpine
 
-# Copy your HTML file to the default web server directory
-COPY /var/lib/jenkins/workspace/docker-push/my_page.html /var/www/html/
+# Copy my_page.html from the build context to the /var/www/html/ directory in the container
+COPY my_page.html /usr/local/apache2/htdocs/
 
 # Expose port 80 for incoming web traffic
 EXPOSE 80
